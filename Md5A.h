@@ -133,6 +133,4 @@ private:
 
 };
 
-extern CMd5A Md5;//´´½¨µÄMd5
-
 #endif // !defined(AFX_MD5A_H__56BDAD81_1478_11D5_80AC_0000E8810675__INCLUDED_)

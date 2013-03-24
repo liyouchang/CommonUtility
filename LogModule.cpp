@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "LogModule.h"
-#include "inifile.h"
+//#include "inifile.h"
 
 
 
@@ -29,25 +29,32 @@ void InitLogModule()
 {
 
 	log4cplus::tstring iniFile =GetCurrentPath() + _T("log.ini");
-	CIniFile ini;
+//	CIniFile ini;
 
-	bool retValue = ini.Load(iniFile);
-	if(!retValue)
-	{
-		TRACE(_T("Load config file error"));
-		return;
-	}
+	//bool retValue = ini.Load(iniFile);
+	//if(!retValue)
+	//{
+	//	TRACE(_T("Load config file error"));
+	//	return;
+	//}
+	
 #ifndef _NOLOG
-	log4cplus::tstring logFileName = ini.GetKeyValue(_T("log"),_T("logFileName"),_T("log.log"));
-	logFileName = GetCurrentPath() + logFileName;
-	log4cplus::tstring sLogLevel = ini.GetKeyValue(_T("log"),_T("logLevel"),_T("OFF_LOG_LEVEL"));
+	TCHAR fileName[MAX_PATH];
+	::GetPrivateProfileString(_T("log"),_T("logFileName"),_T("log.log"),fileName,MAX_PATH,iniFile.c_str());
+	//log4cplus::tstring logFileName = ini.GetKeyValue(_T("log"),_T("logFileName"),_T("log.log"));
+	log4cplus::tstring logFileName ;
+	logFileName = GetCurrentPath() + fileName;
 
-
+	TCHAR logLevel[16];
+	//log4cplus::tstring sLogLevel = ini.GetKeyValue(_T("log"),_T("logLevel"),_T("OFF_LOG_LEVEL"));
+	::GetPrivateProfileString(_T("log"),_T("logLevel"),_T("OFF_LOG_LEVEL"),logLevel,16,iniFile.c_str());
+	log4cplus::tstring sLogLevel = logLevel;
 	log4cplus::LogLevel level = getLogLevelManager().fromString(sLogLevel);
 	Logger::getRoot().setLogLevel(level);
-
+	//AfxMessageBox(logFileName.c_str());
 	//int maxBackupIndex = 2;
 	//long maxFileSize = 10*1024*1024;
+
 	if(level  != NOT_SET_LOG_LEVEL)
 	{
 		SharedAppenderPtr append_1(new RollingFileAppender(logFileName));
@@ -56,6 +63,7 @@ void InitLogModule()
 		log4cplus::tstring pattern = LOG4CPLUS_TEXT("%D{%m/%d/%y %H:%M:%S,%Q} [%t] %-5p - %m [%l]%n");
 		append_1->setLayout( std::auto_ptr<Layout>(new PatternLayout(pattern)));
 		Logger::getRoot().addAppender(append_1);
+		
 	}
 
 #endif

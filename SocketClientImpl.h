@@ -6,7 +6,7 @@
 #include <vector>
 #pragma warning(pop)
 #include "SocketHandle.h"
-
+#include <atlbase.h>
 /**
  * ISocketClientHandler
  * Event handler that SocketClientImpl<T> must implement
@@ -117,6 +117,7 @@ bool SocketClientImpl<T, tBufferSize>::StartClient(LPCTSTR pszHost, LPCTSTR pszR
     }
     if ( result )
     {
+		
         _thread = AtlCreateThread(SocketClientProc, this);
         if ( _thread == NULL )
         {

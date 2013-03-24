@@ -45,7 +45,7 @@ void CMd5A::MD5Update (MD5_CTX *context, unsigned char *input,unsigned int input
   unsigned int i, index, partLen;
   index = (unsigned int)((context->count[0] >> 3) & 0x3F);   /* Compute number of bytes mod 64 */
 
-  if ( (context->count[0] += ( (UINT4)inputLen << 3) ) < ( (UINT4)inputLen << 3 ) )
+  if ( (context->count[0] += ( (UINT4)inputLen << 3) ) < ( (UINT4)inputLen<< 3 ) )
 		context->count[1]++;
   
   context->count[1] += ((UINT4)inputLen >> 29);
@@ -224,16 +224,23 @@ void CMd5A::MD5_memset (POINTER output,int value,unsigned int len)
 }
 
 /* Digests a string and prints the result. */
-						//用户和密钥16  生成的md5串
 char* CMd5A::MDString(const char* data, char *MD5String)
 {
-  MD5_CTX context;
-  const int len = 24;
-  MD5Init (&context);
-  MD5Update (&context, (unsigned char*)data, len);
-  MD5Final ((unsigned char*)MD5String, &context);
-  return MD5String;
+	byte md5Data[20];
+	MD5_CTX context;
+	const int len = strlen(data);
+	MD5Init (&context);
+	MD5Update (&context, (unsigned char*)data, len);
+	MD5Final ((unsigned char*)md5Data, &context);
+
+	for (int i = 0; i < 16; i ++)
+	{
+		sprintf(MD5String + i * 2, "%0.2x", md5Data[i]);
+	}
+
+	return MD5String;
 }
+
 
   
 /* Digests a file and prints the result. */
@@ -252,10 +259,7 @@ CString CMd5A::MDFile (CString filename)
 	if (file.Open(filename,CFile::modeRead)==0)
 	{
 		//printf ("%s can't be opened\n", filename);
-		
-        //MyMessageBox(MyString2,"open file error！",MyBool0);
-	//	AfxMessageBox("open file error");
-		return _T("");
+		return "";
     }
 	else 
 	{
@@ -371,4 +375,3 @@ char* CMd5A::hmac_md5(char* text,char*  key)
         return output;     
 }
  
-CMd5A Md5;//创建的Md5

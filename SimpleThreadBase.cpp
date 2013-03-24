@@ -12,7 +12,10 @@ SimpleThreadBase::SimpleThreadBase(void)
 SimpleThreadBase::~SimpleThreadBase(void)
 {
 	if (_thread != INVALID_HANDLE_VALUE)
+	{
 		::CloseHandle (_thread);
+		_thread = INVALID_HANDLE_VALUE;
+	}
 }
 
 unsigned int __stdcall SimpleThreadBase::ThreadProc( void* arg )
@@ -42,17 +45,22 @@ void SimpleThreadBase::Join()
 {
 	::WaitForSingleObject (_thread, INFINITE);
 	flags |= fJOINED;
+	toStop = false;
 }
 
 void SimpleThreadBase::Stop( DWORD dwTimeout/* = INFINITE */)
 {
 	toStop = true;
-	if ( _thread != NULL )
+	if ( _thread != INVALID_HANDLE_VALUE )
 	{
 		if ( WaitForSingleObject(_thread, dwTimeout) == WAIT_TIMEOUT ) {
 			TerminateThread(_thread, 1);
 		}
-		CloseHandle(_thread);
-		_thread = NULL;
+		if (_thread != INVALID_HANDLE_VALUE)
+		{
+			::CloseHandle (_thread);
+			_thread = INVALID_HANDLE_VALUE;
+		}
 	}
+	toStop = false;
 }
